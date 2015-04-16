@@ -1,11 +1,20 @@
 #include "Racquet.h"
 
 
-Racquet::Racquet(void)
+Racquet::Racquet(float inRangeX, float inRangeY)
 {
+	rangeX = inRangeX;
+	rangeY = inRangeY;
+	radius = 0.3f;
 	x = 0;
 	y = 0;
 	step = 0.2;
+}
+
+Racquet::Racquet(void)
+{
+	rangeX = 1;
+	rangeY = 1;
 }
 
 
@@ -17,16 +26,16 @@ void Racquet::move(MOVE_DIRECTION direction) {
 	switch (direction)
 	{
 	case UP:
-		y+=step;
+		if(y<(rangeY-radius)) y+=step;
 		break;
 	case DOWN:
-		y-=step;
+		if(y>(-rangeY+radius)) y-=step;
 		break;
 	case LEFT:
-		x-=step;
+		if(x>(-rangeX+radius)) x-=step;
 		break;
 	case RIGHT:
-		x+=step;
+		if(x<(rangeX-radius)) x+=step;
 		break;
 	}
 }

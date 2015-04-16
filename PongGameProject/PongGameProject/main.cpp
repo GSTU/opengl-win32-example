@@ -44,9 +44,9 @@ GLdouble radius;
 GLvoid resize(GLsizei, GLsizei); 
 GLvoid initializeGL(GLsizei, GLsizei); 
 GLvoid drawScene(GLvoid); 
-void polarView( GLdouble, GLdouble, GLdouble, GLdouble); 
 
 Game gameContext;
+
 
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) 
 { 
@@ -228,11 +228,8 @@ BOOL bSetupPixelFormat(HDC hdc)
 GLvoid resize( GLsizei width, GLsizei height ) 
 { 
     GLfloat aspect; 
- 
     glViewport( 0, 0, width, height ); 
- 
     aspect = (GLfloat) width / height; 
- 
     glMatrixMode( GL_PROJECTION ); 
     glLoadIdentity(); 
     gluPerspective( 45.0, aspect, 3.0, 17.0 ); 
@@ -256,7 +253,7 @@ GLvoid createObjects()
         quadObj = gluNewQuadric (); 
 		gluQuadricDrawStyle (quadObj, GLU_FILL); 
         gluQuadricNormals (quadObj, GLU_SMOOTH); 
-        gluDisk(quadObj, 0, 0.5, 32,16);
+		gluDisk(quadObj, 0, gameContext.racquet.radius, 32,16);
 		glPopMatrix (); 
     glEndList(); 
 
@@ -295,23 +292,9 @@ GLvoid initializeGL(GLsizei width, GLsizei height)
     createObjects(); 
 } 
  
-void polarView(GLdouble radius, GLdouble twist, GLdouble latitude, 
-           GLdouble longitude) 
-{ 
-    glTranslated(0.0, 0.0, -radius); 
-    glRotated(-twist, 0.0, 0.0, 1.0); 
-    glRotated(-latitude, 1.0, 0.0, 0.0); 
-    glRotated(longitude, 0.0, 0.0, 1.0);      
+  
+
  
-} 
-
-#define GAME_WIDTH    1.6f
-#define GAME_HEIGHT   1.0f
-#define GAME_DEPTH   -7.0f
-
-#define MESH_X_STEP   0.2f
-#define MESH_Y_STEP   0.2f
-#define MESH_Z_STEP   0.5f
 
 float sx = 0.01;
 float sy = 0.01;
@@ -404,17 +387,16 @@ GLvoid drawScene(GLvoid)
 		sz=-sz;
 	}
 
-	polarView( radius, 0, 0, 0 ); 
+
+	glTranslated(0.0, 0.0, -radius); 
 	
 	glIndexi(BLUE_INDEX); 
     glCallList(GLOBE); 
 
 	glPopMatrix();
 
-	glTranslatef(0,0,-3); 
-	polarView( radius, 0, 0, 0 ); 
+	glTranslated(0.0, 0.0, -radius); 
  
-
 	glColor4f(0,1,0,0.8);
     glPushMatrix(); 
 
