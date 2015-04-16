@@ -6,6 +6,7 @@
 #include <windows.h> 
 #include <GL/gl.h> 
 #include <GL/glu.h> 
+#include "Game.h"
 
 /*
  * Link opengl libraries 
@@ -19,10 +20,6 @@ HWND  ghWnd;
 HDC   ghDC; 
 HGLRC ghRC; 
 
-float rposx = 0;
-float rposy = 0;
-float rstep = 0.1;
- 
 #define SWAPBUFFERS SwapBuffers(ghDC) 
 #define BLACK_INDEX     0 
 #define RED_INDEX       13 
@@ -38,6 +35,7 @@ BOOL bSetupPixelFormat(HDC);
 GLfloat latitude, longitude, latinc, longinc; 
 GLdouble radius; 
  
+
 #define GLOBE    1 
 #define CYLINDER 2 
 #define CONE     3 
@@ -47,7 +45,9 @@ GLvoid resize(GLsizei, GLsizei);
 GLvoid initializeGL(GLsizei, GLsizei); 
 GLvoid drawScene(GLvoid); 
 void polarView( GLdouble, GLdouble, GLdouble, GLdouble); 
- 
+
+Game gameContext;
+
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) 
 { 
     MSG        msg; 
@@ -167,20 +167,16 @@ LONG WINAPI MainWndProc (
     case WM_KEYDOWN: 
         switch (wParam) { 
         case VK_LEFT: 
-			rposx-=rstep;
-			//longinc += 0.5F; 
+			gameContext.racquet.move(Racquet::LEFT);
             break; 
         case VK_RIGHT: 
-			rposx+=rstep;
-            //longinc -= 0.5F; 
+			gameContext.racquet.move(Racquet::RIGHT);
             break; 
         case VK_UP: 
-			rposy+=rstep;
-            //latinc += 0.5F; 
+			gameContext.racquet.move(Racquet::UP);
             break; 
         case VK_DOWN: 
-			rposy-=rstep;
-            //latinc -= 0.5F; 
+			gameContext.racquet.move(Racquet::DOWN);
             break; 
         } 
  
@@ -246,33 +242,13 @@ GLvoid resize( GLsizei width, GLsizei height )
 GLvoid createObjects() 
 { 
     GLUquadricObj *quadObj; 
-	//GLUtesselatorObj *quadObj;
-	
 
     glNewList(GLOBE, GL_COMPILE); 
         quadObj = gluNewQuadric (); 
         gluQuadricDrawStyle (quadObj, GLU_LINE); 
         gluSphere (quadObj, 0.2, 16, 16); 
     glEndList(); 
- 
-
-	/*glNewList(QUAD, GL_COMPILE); 
-        quadObj = gluNewQuadric (); 
-        gluQuadricDrawStyle (quadObj, GLU_LINE); 
-        
-		gluSphere (quadObj, 0.3, 32, 32); 
-    glEndList(); */
- 
-
-   /* glNewList(CONE, GL_COMPILE); 
-		quadObj = gluNewQuadric (); 
-        gluQuadricDrawStyle (quadObj, GLU_FILL); 
-        gluQuadricNormals (quadObj, GLU_SMOOTH); 
-		gluQuadricDrawStyle (quadObj, GLU_LINE); 
-		gluDisk(quadObj, 0.1, 1, 1,5);
-		gluCylinder(quadObj, 0.3, 0.0, 0.6, 15, 10); 
-    glEndList(); */
-	
+ 	
     glNewList(CYLINDER, GL_COMPILE); 
         glPushMatrix (); 
         glRotatef ((GLfloat)90.0, (GLfloat)1.0, (GLfloat)0.0, (GLfloat)0.0); 
@@ -280,7 +256,6 @@ GLvoid createObjects()
         quadObj = gluNewQuadric (); 
 		gluQuadricDrawStyle (quadObj, GLU_FILL); 
         gluQuadricNormals (quadObj, GLU_SMOOTH); 
-        //gluCylinder (quadObj, 0.3, 0.3, 0.6, 12, 2); 
         gluDisk(quadObj, 0, 0.5, 32,16);
 		glPopMatrix (); 
     glEndList(); 
@@ -330,6 +305,14 @@ void polarView(GLdouble radius, GLdouble twist, GLdouble latitude,
  
 } 
 
+#define GAME_WIDTH    1.6f
+#define GAME_HEIGHT   1.0f
+#define GAME_DEPTH   -7.0f
+
+#define MESH_X_STEP   0.2f
+#define MESH_Y_STEP   0.2f
+#define MESH_Z_STEP   0.5f
+
 float sx = 0.01;
 float sy = 0.01;
 float sz = -0.01;
@@ -340,67 +323,70 @@ float posz = 0;
 
 float widthBorder = 1.5f;
 
+float isGameStarted = false; 
+
 GLvoid drawScene(GLvoid) 
 { 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); 
  
     glPushMatrix(); 
-		
-	glTranslatef(0,0,-3);
-	glColor3f(0,1,0);
+	
+	glPushMatrix();
+		glTranslatef(0,0,-3);
+		glColor3f(0,1,0);
 		glBegin(GL_LINES);
 			
+		for(float x = -GAME_WIDTH; x<GAME_WIDTH+MESH_X_STEP; x+=MESH_X_STEP) {
+			glVertex3f(x,GAME_HEIGHT,0);
+			glVertex3f(x,GAME_HEIGHT,GAME_DEPTH);
+
+			glVertex3f(x,-GAME_HEIGHT,0);
+			glVertex3f(x,-GAME_HEIGHT,GAME_DEPTH);
+
+			glVertex3f(x,GAME_HEIGHT,GAME_DEPTH);
+			glVertex3f(x,-GAME_HEIGHT,GAME_DEPTH);
+
+			glVertex3f(x,GAME_HEIGHT,0);
+			glVertex3f(x,GAME_HEIGHT+2,0);
+
+			glVertex3f(x,-GAME_HEIGHT,0);
+			glVertex3f(x,-GAME_HEIGHT-2,0);
+		}
+
+		for(float y = -GAME_HEIGHT; y<=GAME_HEIGHT; y+=MESH_Y_STEP) {
+			glVertex3f(GAME_WIDTH,y,0);
+			glVertex3f(GAME_WIDTH,y,GAME_DEPTH);
+
+			glVertex3f(-GAME_WIDTH,y,0);
+			glVertex3f(-GAME_WIDTH,y,GAME_DEPTH);
+
+			glVertex3f(GAME_WIDTH, y,GAME_DEPTH);
+			glVertex3f(-GAME_WIDTH, y,GAME_DEPTH);
+
+			glVertex3f(GAME_WIDTH,y,0);
+			glVertex3f(GAME_WIDTH+2,y,0); 
+
+			glVertex3f(-GAME_WIDTH,y,0);
+			glVertex3f(-GAME_WIDTH-2,y,0); 
+		}
 		
-			float xpos = -1;
-			float stepx = 0.3;
+		for(float z = GAME_DEPTH; z<=MESH_Z_STEP; z+=MESH_Z_STEP) {
+			glVertex3f(GAME_WIDTH, GAME_HEIGHT, z);
+			glVertex3f(-GAME_WIDTH, GAME_HEIGHT, z);
 
-			while( xpos<1) {
-				glVertex3f(xpos,1,0);
-				glVertex3f(xpos,1,-10);
+			glVertex3f(-GAME_WIDTH, GAME_HEIGHT, z);
+			glVertex3f(-GAME_WIDTH, -GAME_HEIGHT, z);
 
-				glVertex3f(xpos,-1,0);
-				glVertex3f(xpos,-1,-10);
+			glVertex3f(GAME_WIDTH, GAME_HEIGHT, z);
+			glVertex3f(GAME_WIDTH, -GAME_HEIGHT, z);
 
-				glVertex3f(1, xpos,0);
-				glVertex3f(1, xpos,-10);
+			glVertex3f(GAME_WIDTH, -GAME_HEIGHT, z);
+			glVertex3f(-GAME_WIDTH, -GAME_HEIGHT, z);
+		}
 
-				glVertex3f(-1, xpos,0);
-				glVertex3f(-1, xpos,-10);
-				
-				glVertex3f(1, xpos,-10);
-				glVertex3f(-1, xpos,-10);
-
-				glVertex3f(xpos,1,-10);
-				glVertex3f(xpos,-1,-10);
-				
-
-
-				xpos += stepx;
-			}
+		glEnd();
 			
-			float zpos = -10;
-			float stepz = 0.6;
-
-			while( zpos<0) {
-
-				glVertex3f(1, 1, zpos);
-				glVertex3f(-1, 1, zpos);
-
-				glVertex3f(-1, 1, zpos);
-				glVertex3f(-1, -1, zpos);
-
-				glVertex3f(1, 1, zpos);
-				glVertex3f(1, -1, zpos);
-
-				glVertex3f(1, -1, zpos);
-				glVertex3f(-1, -1, zpos);
-
-				zpos += stepz;
-			}
-			
-	glEnd();
-	glTranslatef(0,0,3);	
-
+		glPopMatrix();
 
 	glPushMatrix(); 
 	glTranslatef(posx,posy,posz);
@@ -408,13 +394,13 @@ GLvoid drawScene(GLvoid)
 	posx+=sx;
 	posy+=sy;
 	posz+=sz;
-	if(posx<-1||posx>1) {
+	if(posx<-GAME_WIDTH||posx>GAME_WIDTH) {
 		sx=-sx;
 	}
-	if(posy<-1||posy>1) {
+	if(posy<-GAME_HEIGHT||posy>GAME_HEIGHT) {
 		sy=-sy;
 	}
-	if(posz<-10||posz>0) {
+	if(posz<GAME_DEPTH||posz>0) {
 		sz=-sz;
 	}
 
@@ -425,40 +411,22 @@ GLvoid drawScene(GLvoid)
 
 	glPopMatrix();
 
-	// Ўар тут
-
-
-	glTranslatef(0,0,-3);
-
-        //latitude += latinc; 
-        //longitude += longinc; 
- 
-        //polarView( radius, 0, latitude, longitude ); 
- 
-		polarView( radius, 0, 0, 0 ); 
+	glTranslatef(0,0,-3); 
+	polarView( radius, 0, 0, 0 ); 
  
 
-       /* glIndexi(RED_INDEX); 
-        glCallList(CONE); */
- 
-        /*glIndexi(BLUE_INDEX); 
-        glCallList(GLOBE); */
- 
-    //glIndexi(GREEN_INDEX); 
+	glColor4f(0,1,0,0.8);
+    glPushMatrix(); 
 
-		glColor4f(0,1,0,0.8);
-        glPushMatrix(); 
-
-		 glEnable(GL_ALPHA_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_ALPHA_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable (GL_BLEND);
 
-
-		glEnable(GL_BLEND);
-			glTranslatef(rposx, rposy, 0.0F); 
-            glRotatef(90.0F, 1.0F, 0.0F, 0.0F); 
-            glCallList(CYLINDER); 
-        glPopMatrix(); 
+	glEnable(GL_BLEND);
+	glTranslatef(gameContext.racquet.x, gameContext.racquet.y, 0.0F); 
+        glRotatef(90.0F, 1.0F, 0.0F, 0.0F); 
+        glCallList(CYLINDER); 
+    glPopMatrix(); 
  
     glPopMatrix(); 
  
