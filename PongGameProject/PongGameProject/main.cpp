@@ -177,22 +177,39 @@ LONG WINAPI MainWndProc (
     case WM_KEYDOWN: 
         switch (wParam) { 
         case VK_LEFT: 
-			gameContext.racquet.move(Racquet::LEFT);
+			gameContext.racquet.keyDown(Racquet::LEFT);
             break; 
         case VK_RIGHT: 
-			gameContext.racquet.move(Racquet::RIGHT);
+			gameContext.racquet.keyDown(Racquet::RIGHT);
             break; 
         case VK_UP: 
-			gameContext.racquet.move(Racquet::UP);
+			gameContext.racquet.keyDown(Racquet::UP);
             break; 
         case VK_DOWN: 
-			gameContext.racquet.move(Racquet::DOWN);
+			gameContext.racquet.keyDown(Racquet::DOWN);
             break; 
 		case VK_SPACE:
 			gameContext.isPause = !gameContext.isPause;
 			break;
+        }
+		break;
+	case WM_KEYUP:
+		switch (wParam) { 
+        case VK_LEFT: 
+			gameContext.racquet.keyUp(Racquet::LEFT);
+            break; 
+        case VK_RIGHT: 
+			gameContext.racquet.keyUp(Racquet::RIGHT);
+            break; 
+        case VK_UP: 
+			gameContext.racquet.keyUp(Racquet::UP);
+            break; 
+        case VK_DOWN: 
+			gameContext.racquet.keyUp(Racquet::DOWN);
+            break; 
+        }
+		break;
 		
-        } 
  
     default: 
         lRet = DefWindowProc (hWnd, uMsg, wParam, lParam); 
@@ -404,6 +421,7 @@ GLvoid drawScene(GLvoid)
 		glCallList(GLOBE); 
 	glPopMatrix();
 
+	gameContext.racquet.move();
     glPushMatrix(); 
 		glTranslated(0.0, 0.0, -radius); 
 		glColor4f(0,1,0,0.8);

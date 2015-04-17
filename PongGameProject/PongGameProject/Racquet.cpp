@@ -8,7 +8,11 @@ Racquet::Racquet(float inRangeX, float inRangeY)
 	radius = 0.6f;
 	x = 0;
 	y = 0;
-	step = 0.3;
+	step = 0.1;
+	keyPressed[0] = false;
+	keyPressed[1] = false;
+	keyPressed[2] = false;
+	keyPressed[3] = false;
 }
 
 Racquet::Racquet(void)
@@ -22,20 +26,26 @@ Racquet::~Racquet(void)
 {
 }
 
-void Racquet::move(MOVE_DIRECTION direction) {
-	switch (direction)
-	{
-	case UP:
+void Racquet::keyDown(Racquet::MOVE_DIRECTION direction) {
+	keyPressed[direction] = true;
+}
+
+void Racquet::keyUp(Racquet::MOVE_DIRECTION direction) {
+	keyPressed[direction] = false;
+}
+
+void Racquet::move() {
+	if(keyPressed[UP]) {
 		if(y<(rangeY-radius)) y+=step;
-		break;
-	case DOWN:
-		if(y>(-rangeY+radius)) y-=step;
-		break;
-	case LEFT:
-		if(x>(-rangeX+radius)) x-=step;
-		break;
-	case RIGHT:
-		if(x<(rangeX-radius)) x+=step;
-		break;
 	}
+	if(keyPressed[DOWN]) {
+		if(y>(-rangeY+radius)) y-=step;
+	}
+	if(keyPressed[LEFT]) {
+		if(x>(-rangeX+radius)) x-=step;
+	}
+	if(keyPressed[RIGHT]) {
+		if(x<(rangeX-radius)) x+=step;
+	}
+
 }
