@@ -2,6 +2,7 @@
 #include "Racquet.h"
 #include "Ball.h"
 #include "PlayField.h"
+#include <cmath>
 
 class Game
 {
@@ -12,5 +13,6 @@ public:
 	Game(void);
 	~Game(void);
 	void moveBall();
+	bool isGameStarted;
 };
 

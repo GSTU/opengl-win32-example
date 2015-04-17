@@ -5,6 +5,7 @@ public:
 	float x;
 	float y;
 	float z;
+	float radius;
 	float speedX;
 	float speedY;
 	float speedZ;

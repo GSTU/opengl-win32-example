@@ -4,7 +4,7 @@ PlayField::PlayField(void)
 {
 	width = 2.2f;
 	height = 1.4f;
-	depth = -7.0f;
+	depth = -6.0f;
 	meshXStep = 0.2f;
 	meshYStep = 0.2f;
 	meshZStep = 0.5f;

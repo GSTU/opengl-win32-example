@@ -5,10 +5,10 @@ Racquet::Racquet(float inRangeX, float inRangeY)
 {
 	rangeX = inRangeX;
 	rangeY = inRangeY;
-	radius = 0.3f;
+	radius = 0.6f;
 	x = 0;
 	y = 0;
-	step = 0.2;
+	step = 0.3;
 }
 
 Racquet::Racquet(void)

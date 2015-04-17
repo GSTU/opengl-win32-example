@@ -106,7 +106,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
                 return TRUE; 
             } 
         } 
-        drawScene(); 
+		if(gameContext.isGameStarted) {
+			drawScene(); 
+		}
     } 
 } 
  
@@ -178,6 +180,12 @@ LONG WINAPI MainWndProc (
         case VK_DOWN: 
 			gameContext.racquet.move(Racquet::DOWN);
             break; 
+		case VK_SPACE:
+			//gameContext.isGameStarted = true;
+			//gameContext.ball.x = 0;
+			//gameContext.ball.y = 0;
+			//gameContext.ball.speedZ = gameContext.ball.speedZ;
+			break;
         } 
  
     default: 
@@ -243,7 +251,7 @@ GLvoid createObjects()
     glNewList(GLOBE, GL_COMPILE); 
         quadObj = gluNewQuadric (); 
         gluQuadricDrawStyle (quadObj, GLU_LINE); 
-        gluSphere (quadObj, 0.2, 16, 16); 
+		gluSphere (quadObj, gameContext.ball.radius, 16, 16); 
     glEndList(); 
  	
     glNewList(CYLINDER, GL_COMPILE); 
@@ -398,7 +406,7 @@ GLvoid drawScene(GLvoid)
 		glEnable (GL_BLEND);
 
 		glEnable(GL_BLEND);
-		glTranslatef(gameContext.racquet.x, gameContext.racquet.y, 0.0F); 
+		glTranslatef(gameContext.racquet.x, gameContext.racquet.y, -gameContext.racquet.radius); 
 		glRotatef(90.0F, 1.0F, 0.0F, 0.0F); 
 		glCallList(CYLINDER); 
     glPopMatrix(); 

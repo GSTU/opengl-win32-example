@@ -10,6 +10,8 @@ Ball::Ball(void)
 	speedX = 0.02;
 	speedY = 0.02;
 	speedZ = -0.02;
+
+	radius = 0.2;
 }
 
 
