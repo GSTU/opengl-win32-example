@@ -14,5 +14,6 @@ public:
 	~Game(void);
 	void moveBall();
 	bool isGameStarted;
+	bool isPause;
 };
 

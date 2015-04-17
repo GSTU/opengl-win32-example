@@ -105,9 +105,17 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
             } else { 
                 return TRUE; 
             } 
-        } 
-		if(gameContext.isGameStarted) {
-			drawScene(); 
+        }
+
+		if(!gameContext.isPause) {
+			if(gameContext.isGameStarted) {
+				drawScene(); 
+			} else {
+				 MessageBox(NULL, "You Lose, press SPACE to start new game", "Info", MB_OK); 
+				 Game g;
+				 gameContext = g;
+				 gameContext.isPause = true;
+			}
 		}
     } 
 } 
@@ -181,11 +189,9 @@ LONG WINAPI MainWndProc (
 			gameContext.racquet.move(Racquet::DOWN);
             break; 
 		case VK_SPACE:
-			//gameContext.isGameStarted = true;
-			//gameContext.ball.x = 0;
-			//gameContext.ball.y = 0;
-			//gameContext.ball.speedZ = gameContext.ball.speedZ;
+			gameContext.isPause = !gameContext.isPause;
 			break;
+		
         } 
  
     default: 
@@ -226,7 +232,7 @@ BOOL bSetupPixelFormat(HDC hdc)
     { 
         MessageBox(NULL, "SetPixelFormat failed", "Error", MB_OK); 
         return FALSE; 
-    } 
+    }
  
     return TRUE; 
 } 

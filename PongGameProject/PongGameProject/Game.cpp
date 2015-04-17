@@ -7,6 +7,7 @@ Game::Game(void)
 	isGameStarted = true;
 	Racquet r(playField.width, playField.height);
 	racquet = r;
+	isPause = false;
 }
 
 
