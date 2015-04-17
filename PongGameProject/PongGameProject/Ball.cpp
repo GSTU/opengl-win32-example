@@ -7,9 +7,11 @@ Ball::Ball(void)
 	y = 0;
 	z = 0;
 	
-	speedX = 0.02;
-	speedY = 0.02;
-	speedZ = -0.02;
+	defSpeed = 0.04;
+	speedX = -0.01;
+	speedY = -0.02;
+	speedZ = -defSpeed;
+	speedZStep = -0.004;
 
 	radius = 0.2;
 }

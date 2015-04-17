@@ -9,6 +9,8 @@ public:
 	float speedX;
 	float speedY;
 	float speedZ;
+	float defSpeed;
+	float speedZStep;
 
 	Ball(void);
 	~Ball(void);
