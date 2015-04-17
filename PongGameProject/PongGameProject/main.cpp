@@ -291,22 +291,82 @@ GLvoid initializeGL(GLsizei width, GLsizei height)
  
     createObjects(); 
 } 
- 
-  
 
- 
+GLvoid drawPlayField() {
+	glBegin(GL_LINES);
+	
+	float w = gameContext.playField.width;
+	float h = gameContext.playField.height;
+	float d = gameContext.playField.depth;
+	float stepX = gameContext.playField.meshXStep;
+	float stepY = gameContext.playField.meshYStep;
+	float stepZ = gameContext.playField.meshZStep;
 
-float sx = 0.01;
-float sy = 0.01;
-float sz = -0.01;
+	for(float x = -w; x<w+stepX; x+=stepX) {
+			glVertex3f(x,h,0);
+			glVertex3f(x,h,d);
 
-float posx = 0;
-float posy = 0;
-float posz = 0;
+			glVertex3f(x,-h,0);
+			glVertex3f(x,-h,d);
 
-float widthBorder = 1.5f;
+			glVertex3f(x,h,d);
+			glVertex3f(x,-h,d);
 
-float isGameStarted = false; 
+			glVertex3f(x,h,0);
+			glVertex3f(x,h+2,0);
+
+			glVertex3f(x,-h,0);
+			glVertex3f(x,-h-2,0);
+		}
+
+		for(float y = -h; y<=h; y+=stepY) {
+			glVertex3f(w,y,0);
+			glVertex3f(w,y,d);
+
+			glVertex3f(-w,y,0);
+			glVertex3f(-w,y,d);
+
+			glVertex3f(w, y,d);
+			glVertex3f(-w, y,d);
+
+			glVertex3f(w,y,0);
+			glVertex3f(w+2,y,0); 
+
+			glVertex3f(-w,y,0);
+			glVertex3f(-w-2,y,0); 
+		}
+		
+		for(float z = d; z<-stepZ; z+=stepZ) {
+			glVertex3f(w, h, z);
+			glVertex3f(-w, h, z);
+
+			glVertex3f(-w, h, z);
+			glVertex3f(-w, -h, z);
+
+			glVertex3f(w, h, z);
+			glVertex3f(w, -h, z);
+
+			glVertex3f(w, -h, z);
+			glVertex3f(-w, -h, z);
+		}
+
+		float over= 2;
+		for(float xx = 0; xx<=over; xx+=0.2) {
+			glVertex3f(w+over, h+xx, 0);
+			glVertex3f(-w-over, h+xx, 0);
+
+			glVertex3f(w+over, -h-xx, 0);
+			glVertex3f(-w-over, -h-xx, 0);
+			
+			glVertex3f(-w-xx, h+over, 0);
+			glVertex3f(-w-xx, -h-over, 0);
+
+			glVertex3f(w+xx, h+over, 0);
+			glVertex3f(w+xx, -h-over, 0);
+		}
+
+		glEnd();
+}
 
 GLvoid drawScene(GLvoid) 
 { 
@@ -315,99 +375,32 @@ GLvoid drawScene(GLvoid)
     glPushMatrix(); 
 	
 	glPushMatrix();
-		glTranslatef(0,0,-3);
+		glTranslatef(0,0,-radius);
 		glColor3f(0,1,0);
-		glBegin(GL_LINES);
+		drawPlayField();
 			
-		for(float x = -GAME_WIDTH; x<GAME_WIDTH+MESH_X_STEP; x+=MESH_X_STEP) {
-			glVertex3f(x,GAME_HEIGHT,0);
-			glVertex3f(x,GAME_HEIGHT,GAME_DEPTH);
-
-			glVertex3f(x,-GAME_HEIGHT,0);
-			glVertex3f(x,-GAME_HEIGHT,GAME_DEPTH);
-
-			glVertex3f(x,GAME_HEIGHT,GAME_DEPTH);
-			glVertex3f(x,-GAME_HEIGHT,GAME_DEPTH);
-
-			glVertex3f(x,GAME_HEIGHT,0);
-			glVertex3f(x,GAME_HEIGHT+2,0);
-
-			glVertex3f(x,-GAME_HEIGHT,0);
-			glVertex3f(x,-GAME_HEIGHT-2,0);
-		}
-
-		for(float y = -GAME_HEIGHT; y<=GAME_HEIGHT; y+=MESH_Y_STEP) {
-			glVertex3f(GAME_WIDTH,y,0);
-			glVertex3f(GAME_WIDTH,y,GAME_DEPTH);
-
-			glVertex3f(-GAME_WIDTH,y,0);
-			glVertex3f(-GAME_WIDTH,y,GAME_DEPTH);
-
-			glVertex3f(GAME_WIDTH, y,GAME_DEPTH);
-			glVertex3f(-GAME_WIDTH, y,GAME_DEPTH);
-
-			glVertex3f(GAME_WIDTH,y,0);
-			glVertex3f(GAME_WIDTH+2,y,0); 
-
-			glVertex3f(-GAME_WIDTH,y,0);
-			glVertex3f(-GAME_WIDTH-2,y,0); 
-		}
-		
-		for(float z = GAME_DEPTH; z<=MESH_Z_STEP; z+=MESH_Z_STEP) {
-			glVertex3f(GAME_WIDTH, GAME_HEIGHT, z);
-			glVertex3f(-GAME_WIDTH, GAME_HEIGHT, z);
-
-			glVertex3f(-GAME_WIDTH, GAME_HEIGHT, z);
-			glVertex3f(-GAME_WIDTH, -GAME_HEIGHT, z);
-
-			glVertex3f(GAME_WIDTH, GAME_HEIGHT, z);
-			glVertex3f(GAME_WIDTH, -GAME_HEIGHT, z);
-
-			glVertex3f(GAME_WIDTH, -GAME_HEIGHT, z);
-			glVertex3f(-GAME_WIDTH, -GAME_HEIGHT, z);
-		}
-
-		glEnd();
-			
-		glPopMatrix();
-
-	glPushMatrix(); 
-	glTranslatef(posx,posy,posz);
-
-	posx+=sx;
-	posy+=sy;
-	posz+=sz;
-	if(posx<-GAME_WIDTH||posx>GAME_WIDTH) {
-		sx=-sx;
-	}
-	if(posy<-GAME_HEIGHT||posy>GAME_HEIGHT) {
-		sy=-sy;
-	}
-	if(posz<GAME_DEPTH||posz>0) {
-		sz=-sz;
-	}
-
-
-	glTranslated(0.0, 0.0, -radius); 
-	
-	glIndexi(BLUE_INDEX); 
-    glCallList(GLOBE); 
-
 	glPopMatrix();
 
-	glTranslated(0.0, 0.0, -radius); 
- 
-	glColor4f(0,1,0,0.8);
+	glPushMatrix(); 
+		glTranslated(0.0, 0.0, -radius); 
+		glTranslatef(gameContext.ball.x,gameContext.ball.y,gameContext.ball.z);
+		gameContext.moveBall();
+
+		glIndexi(BLUE_INDEX); 
+		glCallList(GLOBE); 
+	glPopMatrix();
+
     glPushMatrix(); 
+		glTranslated(0.0, 0.0, -radius); 
+		glColor4f(0,1,0,0.8);
+		glEnable(GL_ALPHA_TEST);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable (GL_BLEND);
 
-	glEnable(GL_ALPHA_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable (GL_BLEND);
-
-	glEnable(GL_BLEND);
-	glTranslatef(gameContext.racquet.x, gameContext.racquet.y, 0.0F); 
-        glRotatef(90.0F, 1.0F, 0.0F, 0.0F); 
-        glCallList(CYLINDER); 
+		glEnable(GL_BLEND);
+		glTranslatef(gameContext.racquet.x, gameContext.racquet.y, 0.0F); 
+		glRotatef(90.0F, 1.0F, 0.0F, 0.0F); 
+		glCallList(CYLINDER); 
     glPopMatrix(); 
  
     glPopMatrix(); 

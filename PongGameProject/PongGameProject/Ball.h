@@ -4,8 +4,14 @@ class Ball
 public:
 	float x;
 	float y;
+	float z;
+	float speedX;
+	float speedY;
+	float speedZ;
+
 	Ball(void);
 	~Ball(void);
-	void updatePosition(float , float);
+	void setPosition(float , float);
+	void move();
 };
 
